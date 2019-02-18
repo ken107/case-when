@@ -37,8 +37,9 @@ const result = await Case(val)
   .when(0, "zero")
   .when(1, async () => "one")
   .when(async x => x > 1000, "huge")
-  .when(x => x > 100, () => "large")
+  .when(async x => x > 100, async () => "large")
+  .when(x => x > 10, () => "medium")
   .else(async () => "small")
 ```
 
-In other words, uber flexible!
+In other words, any way you like!
