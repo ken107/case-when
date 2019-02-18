@@ -1,6 +1,6 @@
 {
   "name": "case-when",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Case-when operator for JavaScript",
   "main": "dist/sync",
   "scripts": {
@@ -9,8 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "github.com:ken107/case-when"
+    "url": "https://github.com/ken107/case-when"
   },
+  "bugs": {
+    "url": "https://github.com/ken107/case-when/issues"
+  },
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "case-when",
     "javascript",
