@@ -1,28 +1,27 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.when = exports.caseWhen = void 0;
 const common_1 = require("./common");
-function caseWhen(param, pred, val) {
-    const list = [{ pred, val }];
+function caseWhen(param, prev) {
     return {
         when(pred, val) {
-            list.push({ pred, val });
-            return this;
+            return caseWhen(param, function () {
+                const pval = prev === null || prev === void 0 ? void 0 : prev();
+                if (pval)
+                    return pval;
+                const pcond = common_1.isFun(pred) ? pred(param) : pred == param;
+                if (pcond)
+                    return [common_1.isFun(val) ? val() : val];
+                return undefined;
+            });
         },
-        else(defVal) {
-            for (const { pred, val } of list) {
-                const cond = common_1.isFun(pred) ? pred(param) : pred == param;
-                if (cond)
-                    return common_1.isFun(val) ? val() : val;
-            }
-            return common_1.isFun(defVal) ? defVal() : defVal;
+        else(val) {
+            const pval = prev === null || prev === void 0 ? void 0 : prev();
+            if (pval)
+                return pval[0];
+            return common_1.isFun(val) ? val() : val;
         }
     };
 }
-function default_1(param) {
-    return {
-        when(pred, val) {
-            return caseWhen(param, pred, val);
-        }
-    };
-}
-exports.default = default_1;
+exports.caseWhen = caseWhen;
+exports.when = caseWhen(true).when;

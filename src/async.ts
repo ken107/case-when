@@ -1,34 +1,30 @@
 import { isFun } from "./common";
 
-export type Predicate<P> = (param: P) => boolean|Promise<boolean>;
-export type Get<V> = () => V|Promise<V>;
+type Pred<P> = (param: P) => boolean|Promise<boolean>;
+type Get<V> = () => V|Promise<V>;
 
-export interface CaseWhen<P, V> {
-  when(pred: P|Predicate<P>, val: V|Get<V>): CaseWhen<P, V>;
-  else(val: V|Get<V>): Promise<V>;
+interface CaseWhen<P, X> {
+  when: <V>(pred: P|Pred<P>, val: V|Get<V>) => CaseWhen<P, X|V>
+  else: <V>(val: V|Get<V>) => Promise<X|V>
 }
 
-function caseWhen<P, V>(param: P, pred: P|Predicate<P>, val: V|Get<V>): CaseWhen<P, V> {
-  const list = [{pred, val}];
+export function caseWhen<P, X=never>(param: P, prev?: () => Promise<[X]|undefined>): CaseWhen<P, X> {
   return {
-    when(pred, val) {
-      list.push({pred, val});
-      return this;
+    when<V>(pred: P|Pred<P>, val: V|Get<V>) {
+      return caseWhen<P, X|V>(param, async function() {
+        const pval = await prev?.()
+        if (pval) return pval
+        const pcond = isFun<Pred<P>>(pred) ? await pred(param) : pred == param
+        if (pcond) return [isFun<Get<V>>(val) ? await val() : val]
+        return undefined
+      })
     },
-    async else(defVal) {
-      for (const {pred, val} of list) {
-        const cond = isFun<Predicate<P>>(pred) ? await pred(param) : pred == param;
-        if (cond) return isFun<Get<V>>(val) ? val() : val;
-      }
-      return isFun<Get<V>>(defVal) ? defVal() : defVal;
+    async else<V>(val: V|Get<V>) {
+      const pval = await prev?.()
+      if (pval) return pval[0]
+      return isFun<Get<V>>(val) ? await val() : val
     }
   }
 }
 
-export default function<P>(param?: P) {
-  return {
-    when<V>(pred: P|Predicate<P>, val: V|Get<V>) {
-      return caseWhen(param, pred, val);
-    }
-  }
-}
+export const when = caseWhen(true).when
