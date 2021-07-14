@@ -9,39 +9,40 @@ npm i case-when
 ## Synchronous Example
 
 ```typescript
-import Case from "case-when"
+import { caseWhen } from "case-when"
 
-const result = Case(val)
+const result = caseWhen(val)
   .when(0, "zero")
-  .when(1, () => "one")
-  .when(x => x > 1000, "huge")
-  .when(x => x > 100, () => "large")
-  .else("small")
+  .when(1, () => 1)
+  .when(x => x > 1000, {name: "John"})
+  .when(x => x > 100, () => null)
+  .else(false)
 ```
 
 or
 
 ```typescript
-const result = Case()
-  .when(() => val == 0, "zero")
-  .when(() => val == 1, () => "one")
-  .when(() => val > 1000, "huge")
-  .when(() => val > 100, () => "large")
-  .else("small")
+import { when } from "case-when"
+
+const result = when(() => val == 0, "zero")
+  .when(() => val == 1, () => 1)
+  .when(() => val > 1000, {name: "John"})
+  .when(() => val > 100, () => null)
+  .else(false)
 ```
 
 ## Async Example
 
 ```typescript
-import Case from "case-when/dist/async"
+import { caseWhen } from "case-when/dist/async"
 
-const result = await Case(val)
+const result = await caseWhen(val)
   .when(0, "zero")
-  .when(1, async () => "one")
-  .when(async x => x > 1000, "huge")
-  .when(async x => x > 100, async () => "large")
-  .when(x => x > 10, () => "medium")
-  .else(async () => "small")
+  .when(1, async () => 1)
+  .when(async x => x > 1000, {name: "John"})
+  .when(async x => x > 100, async () => null)
+  .when(x => x > 10, () => "teen")
+  .else(async () => false)
 ```
 
-In other words, any way you like!
+The return type of the case statement is the union of the return types of all the cases.  Here it would be `string | number | {name: string} | null | false`.
