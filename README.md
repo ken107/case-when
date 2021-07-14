@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ken107/case-when.svg?branch=master)](https://travis-ci.org/ken107/case-when)
+[![Build Status](https://travis-ci.com/ken107/case-when.svg?branch=master)](https://travis-ci.org/ken107/case-when)
 
 ## Install
 
